@@ -1,0 +1,79 @@
+# ==========================================
+# 1. DEPENDENCIES
+# ==========================================
+node_modules/
+jspm_packages/
+package-lock.json
+# Note: Some teams commit package-lock.json, but in microservices 
+# it is often rebuilt during CI/CD. For this project, keep it out 
+# if you want a "clean" repo, or include it for deterministic builds.
+
+# ==========================================
+# 2. BUILD OUTPUTS (TypeScript)
+# ==========================================
+dist/
+lib/
+out/
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# ==========================================
+# 3. SECRETS & ENVIRONMENT (CRITICAL)
+# ==========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# ==========================================
+# 4. LOGS & DEBUGGING
+# ==========================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ==========================================
+# 5. DIAGNOSTIC & COVERAGE (Testing)
+# ==========================================
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+coverage/
+.nyc_output
+.jest/
+
+# ==========================================
+# 6. DATABASE & PRISMA
+# ==========================================
+# If you ever use SQLite for local testing
+*.db
+*.db-journal
+
+# Prisma generated files (should be generated on the fly)
+# We keep the schema and migrations, but ignore the generated client if 
+# it ends up in a custom directory.
+# node_modules/.prisma/ is already ignored by node_modules/
+
+# ==========================================
+# 7. OS & IDE SETTINGS
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ==========================================
+# 8. DOCKER
+# ==========================================
+# Ignore local data volumes so you don't commit 1GB of Postgres data
+pgdata/
