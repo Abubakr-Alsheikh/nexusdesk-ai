@@ -37,7 +37,7 @@ Output must be strictly JSON in this format:
       const userPrompt = `Ticket Title: ${title}\nTicket Description: ${description}`;
 
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
