@@ -62,6 +62,7 @@ coverage/
 # 7. OS & IDE SETTINGS
 # ==========================================
 .DS_Store
+tasks
 Thumbs.db
 .vscode/
 !.vscode/extensions.json

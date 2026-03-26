@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Category {
+  BILLING
+  TECHNICAL
+  ACCOUNT
+  GENERAL
+}
+
+model Ticket {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @db.Text
+  userId      String
+  
+  // AI Generated Metadata
+  category    Category @default(GENERAL)
+  priority    Priority @default(LOW)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([priority])
+}
