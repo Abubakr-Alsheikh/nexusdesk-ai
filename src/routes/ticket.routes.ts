@@ -1,12 +1,15 @@
 import { Router } from 'express';
 import { TicketController } from '../controllers/ticket.controller';
 import { validate } from '../middlewares/validate';
+import { protect } from '../middlewares/auth.middleware';
 import {
   createTicketSchema,
   getTicketsQuerySchema,
 } from '../validators/ticket.schema';
 
 const router = Router();
+
+router.use(protect);
 
 /**
  * @swagger

@@ -27,19 +27,31 @@ enum TicketStatus {
   FAILED
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  tickets   Ticket[]
+  createdAt DateTime @default(now())
+}
+
 model Ticket {
   id          String       @id @default(uuid())
   title       String
   description String       @db.Text
-  userId      String
   status      TicketStatus @default(PENDING)
 
   // AI Generated Metadata
   category    Category?
   priority    Priority?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // Link to User model
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   @@index([category])
   @@index([priority])

@@ -26,6 +26,10 @@ const envSchema = z
       .min(1, { message: 'AI_API_KEY is required for the LLM Service' }),
     AI_BASE_URL: z.string().url().default('https://api.openai.com/v1'),
     AI_MODEL: z.string().default('gpt-5-nano'),
+
+    // JWT
+    JWT_SECRET: z.string().min(32),
+    JWT_EXPIRES_IN: z.union([z.string(), z.number()]).default('1d'),
   })
   .refine(
     (data) =>

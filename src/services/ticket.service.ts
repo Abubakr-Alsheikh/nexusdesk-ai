@@ -7,13 +7,13 @@ import {
 import { AppError } from '../utils/AppError';
 
 export class TicketService {
-  public static async createTicket(data: CreateTicketInput) {
+  public static async createTicket(data: CreateTicketInput, userId: string) {
     try {
       const ticket = await prisma.ticket.create({
         data: {
           title: data.title,
           description: data.description,
-          userId: data.userId,
+          userId: userId,
           status: 'PENDING',
         },
       });
@@ -27,10 +27,14 @@ export class TicketService {
     }
   }
 
-  public static async getAllTickets(filters: TicketFilterQuery) {
+  public static async getAllTickets(
+    filters: TicketFilterQuery,
+    userId: string,
+  ) {
     try {
       return await prisma.ticket.findMany({
         where: {
+          userId: userId,
           category: filters.category,
           priority: filters.priority,
         },
@@ -43,9 +47,9 @@ export class TicketService {
     }
   }
 
-  public static async getTicketById(id: string) {
+  public static async getTicketById(id: string, userId: string) {
     const ticket = await prisma.ticket.findUnique({
-      where: { id },
+      where: { id, userId },
     });
 
     if (!ticket) {

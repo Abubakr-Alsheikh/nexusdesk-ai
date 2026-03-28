@@ -3,9 +3,10 @@ import { Category, Priority } from '@prisma/client';
 
 export const createTicketSchema = z.object({
   body: z.object({
-    title: z.string().min(5, "Title must be at least 5 characters").max(100),
-    description: z.string().min(10, "Description must be at least 10 characters"),
-    userId: z.string().uuid("Invalid User ID format"),
+    title: z.string().min(5, 'Title must be at least 5 characters').max(100),
+    description: z
+      .string()
+      .min(10, 'Description must be at least 10 characters'),
   }),
 });
 

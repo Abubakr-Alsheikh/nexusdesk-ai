@@ -122,21 +122,26 @@ nexusdesk-ai/
 │   │   └── catchAsync.ts  # Async wrapper
 │   ├── middlewares/
 │   │   ├── errorHandler.ts
-│   │   └── validate.ts
+│   │   ├── validate.ts
+│   │   └── auth.middleware.ts  # JWT authentication middleware
 │   ├── validators/
 │   │   ├── ticket.schema.ts
-│   │   └── ai.schema.ts
+│   │   ├── ai.schema.ts
+│   │   └── auth.schema.ts  # Signup/login validation
 │   ├── services/
 │   │   ├── ai.service.ts
+│   │   ├── auth.service.ts  # JWT & bcrypt auth
 │   │   ├── ticket.service.ts
 │   │   ├── db.service.ts
 │   │   ├── queue.service.ts   # BullMQ producer
 │   │   └── worker.service.ts  # BullMQ consumer
 │   ├── controllers/
-│   │   └── ticket.controller.ts
+│   │   ├── ticket.controller.ts
+│   │   └── auth.controller.ts
 │   ├── routes/
 │   │   ├── index.ts
-│   │   └── ticket.routes.ts
+│   │   ├── ticket.routes.ts
+│   │   └── auth.routes.ts
 │   ├── __mocks__/
 │   │   └── prisma.ts          # Jest Prisma mock
 │   └── tests/
@@ -177,6 +182,8 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/dbname
 AI_API_KEY=<openai-key>
 AI_BASE_URL=https://api.openai.com/v1
 AI_MODEL=gpt-5-nano
+JWT_SECRET=<min-32-char-secret>
+JWT_EXPIRES_IN=1d
 ```
 
 ---

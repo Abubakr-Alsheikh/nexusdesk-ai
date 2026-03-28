@@ -123,17 +123,86 @@ Features:
 
 ## 📡 API Documentation
 
+### Authentication
+
+All ticket endpoints require JWT authentication. Include the token in the Authorization header:
+
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+#### **Sign Up**
+
+`POST /api/v1/auth/signup`
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword123",
+  "name": "John Doe"
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "user": {
+      "id": "...",
+      "email": "user@example.com",
+      "name": "John Doe",
+      "createdAt": "2023-10-27T..."
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+#### **Login**
+
+`POST /api/v1/auth/login`
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword123"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "user": {
+      "id": "...",
+      "email": "user@example.com",
+      "name": "John Doe"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
 ### **Create a Support Ticket**
 
 `POST /api/v1/tickets`
+
+**Headers:** `Authorization: Bearer <token>`
 
 **Request Body:**
 
 ```json
 {
   "title": "Payment failing at checkout",
-  "description": "I tried to upgrade to the Pro plan three times, but my card is being rejected with an error 500.",
-  "userId": "550e8400-e29b-41d4-a716-446655440000"
+  "description": "I tried to upgrade to the Pro plan three times, but my card is being rejected with an error 500."
 }
 ```
 
@@ -156,6 +225,7 @@ Features:
 ```
 
 > **Note:** The ticket is created instantly with `PENDING` status. AI analysis happens asynchronously in the background via BullMQ/Redis worker.
+> The `userId` is automatically derived from the JWT token - users can only see and create their own tickets.
 
 ---
 
@@ -167,6 +237,7 @@ Features:
 - **Deterministic AI Guardrails:** We use OpenAI's **JSON Mode** coupled with a **Zod validator** to ensure the LLM never returns invalid categories or priorities.
 - **Containerization:** Full Docker support for reproducible development and deployment environments.
 - **CI/CD Pipeline:** GitHub Actions automates linting, type checking, testing, and Docker image builds.
+- **JWT Authentication:** Stateless JWT-based auth with bcrypt password hashing to secure ticket endpoints.
 
 ---
 
@@ -185,5 +256,5 @@ docker run -p 3000:3000 nexusdesk-ai:latest
 ## 📈 Future Roadmap
 
 - **Vector Search:** Implement **pgvector** to detect duplicate tickets or find similar past resolutions.
-- **Authentication:** Add JWT-based security to protect ticket retrieval endpoints.
 - **Real-time Updates:** Replace polling with WebSockets for instant ticket updates in dashboard.
+- **Role-based Access Control:** Add admin/user roles for ticket management.

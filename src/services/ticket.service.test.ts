@@ -26,11 +26,13 @@ describe('TicketService', () => {
 
     prismaMock.ticket.create.mockResolvedValue(mockTicket);
 
-    const result = await TicketService.createTicket({
-      title: mockTicket.title,
-      description: mockTicket.description,
-      userId: mockTicket.userId,
-    });
+    const result = await TicketService.createTicket(
+      {
+        title: mockTicket.title,
+        description: mockTicket.description,
+      },
+      mockTicket.userId,
+    );
 
     expect(result.title).toBe('Server is down');
     expect(prismaMock.ticket.create).toHaveBeenCalledWith({
