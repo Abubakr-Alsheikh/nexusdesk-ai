@@ -1,6 +1,7 @@
 import { env } from './config/env';
 import app from './app';
 import { prisma } from './services/db.service';
+import { initWorker } from './services/worker.service';
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -10,18 +11,17 @@ process.on('uncaughtException', (err) => {
 
 async function bootstrap() {
   try {
-    // 1. Connect to Database
     await prisma.$connect();
     console.info('✅ Database connection established successfully.');
 
-    // 2. Start the Express Server
+    initWorker();
+    console.info('👷 Background Worker initialized.');
+
     const server = app.listen(env.PORT, () => {
       console.info(`🚀 NexusDesk AI Service running on port ${env.PORT}`);
       console.info(`Environment: ${env.NODE_ENV}`);
     });
 
-    // 3. Graceful Shutdown logic (Standard in Enterprise)
-    // If the process receives a signal to stop (like Ctrl+C), close DB connections first
     process.on('SIGTERM', () => {
       console.info('SIGTERM received. Shutting down gracefully...');
       server.close(() => {

@@ -12,6 +12,7 @@ NexusDesk AI is an enterprise-grade microservice that ingests customer support t
 - **Language:** TypeScript (Strict Mode)
 - **Framework:** Express.js
 - **Database:** PostgreSQL via Prisma
+- **Queue:** BullMQ with Redis
 - **Validation:** Zod
 - **AI:** OpenAI SDK
 
@@ -119,7 +120,8 @@ nexusdesk-ai/
 │   ├── app.ts             # Express configuration
 │   ├── config/
 │   │   ├── env.ts         # Zod environment validation
-│   │   └── swagger.ts    # Swagger UI configuration
+│   │   ├── redis.ts       # BullMQ/Redis configuration
+│   │   └── swagger.ts     # Swagger UI configuration
 │   ├── utils/
 │   │   ├── AppError.ts    # Custom error class
 │   │   └── catchAsync.ts  # Async wrapper
@@ -132,7 +134,9 @@ nexusdesk-ai/
 │   ├── services/
 │   │   ├── ai.service.ts
 │   │   ├── ticket.service.ts
-│   │   └── db.service.ts
+│   │   ├── db.service.ts
+│   │   ├── queue.service.ts   # BullMQ producer
+│   │   └── worker.service.ts  # BullMQ consumer
 │   ├── controllers/
 │   │   └── ticket.controller.ts
 │   └── routes/
@@ -201,7 +205,7 @@ None configured. If adding, place in:
 ### Run the application
 
 ```bash
-# Start PostgreSQL
+# Start PostgreSQL and Redis
 docker-compose up -d
 
 # Run migrations

@@ -15,6 +15,7 @@ This project follows a **Strict Layered Architecture** to ensure maintainability
 - **Validation Layer (Zod):** Enforces a "Security-First" approach by validating all incoming data and environment variables at runtime.
 - **Data Layer (Prisma):** Provides type-safe database access with PostgreSQL.
 - **AI Engine:** A deterministic LLM wrapper that enforces JSON Mode and validates AI hallucinations against a Zod schema.
+- **Background Worker (BullMQ):** Processes AI analysis asynchronously via Redis queue for fast API responses.
 
 ---
 
@@ -24,6 +25,7 @@ This project follows a **Strict Layered Architecture** to ensure maintainability
 - **Language:** TypeScript (Strict Mode)
 - **Framework:** Express.js
 - **Database:** PostgreSQL 16 (via Docker)
+- **Queue:** BullMQ with Redis (Background Job Processing)
 - **ORM:** Prisma
 - **Validation:** Zod (Request, AI Output, and Env validation)
 - **AI:** OpenAI-compatible API (configurable - supports OpenAI, OpenRouter, Anthropic via Proxy, Ollama, etc.)
@@ -78,7 +80,7 @@ AI_MODEL=google/gemini-flash-1.5
 ### 4. Infrastructure & Database Setup
 
 ```bash
-# Start the PostgreSQL container
+# Start PostgreSQL and Redis containers
 docker-compose up -d
 
 # Generate Prisma Client & Run Migrations
@@ -143,13 +145,16 @@ Features:
     "ticket": {
       "id": "...",
       "title": "Payment failing at checkout",
-      "category": "BILLING",
-      "priority": "CRITICAL",
+      "status": "PENDING",
+      "category": null,
+      "priority": null,
       "createdAt": "2023-10-27T..."
     }
   }
 }
 ```
+
+> **Note:** The ticket is created instantly with `PENDING` status. AI analysis happens asynchronously in the background via BullMQ/Redis worker.
 
 ---
 
@@ -157,7 +162,7 @@ Features:
 
 - **Fail-Fast Initialization:** The application validates all environment variables on startup. If a required key is missing, the process terminates immediately with a clear error.
 - **Centralized Error Handling:** Uses a global Express middleware and a custom `AppError` class to handle operational vs. programming errors consistently.
-- **Non-Blocking AI Integration:** Utilizes asynchronous programming to handle LLM latency without blocking the main event loop.
+- **Background Job Processing:** Uses BullMQ with Redis for async AI analysis - API returns instantly while AI processing happens in background with retry logic.
 - **Deterministic AI Guardrails:** We use OpenAI's **JSON Mode** coupled with a **Zod validator** to ensure the LLM never returns invalid categories or priorities.
 - **Containerization:** Full Docker support for reproducible development and deployment environments.
 
@@ -165,7 +170,6 @@ Features:
 
 ## 📈 Future Roadmap
 
-- **Event-Driven Processing:** Integrate **BullMQ/Redis** to move AI analysis to background workers, reducing API latency.
 - **Vector Search:** Implement **pgvector** to detect duplicate tickets or find similar past resolutions.
 - **Authentication:** Add JWT-based security to protect ticket retrieval endpoints.
 - **Unit Testing:** Implement a full suite of Jest tests with Prisma and LLM mocking.

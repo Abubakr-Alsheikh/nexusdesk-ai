@@ -109,18 +109,26 @@
           feed.innerHTML = '';
 
           json.data.tickets.forEach((ticket) => {
-            const priorityColor = {
-              LOW: 'bg-gray-100 text-gray-600',
-              MEDIUM: 'bg-blue-100 text-blue-600',
-              HIGH: 'bg-orange-100 text-orange-600',
-              CRITICAL: 'bg-red-100 text-red-600',
-            }[ticket.priority];
+            const priorityColor =
+              {
+                LOW: 'bg-gray-100 text-gray-600',
+                MEDIUM: 'bg-blue-100 text-blue-600',
+                HIGH: 'bg-orange-100 text-orange-600',
+                CRITICAL: 'bg-red-100 text-red-600',
+              }[ticket.priority] || 'bg-gray-100 text-gray-600';
+
+            const statusColor =
+              {
+                PENDING: 'bg-yellow-100 text-yellow-700',
+                COMPLETED: 'bg-green-100 text-green-700',
+                FAILED: 'bg-red-100 text-red-700',
+              }[ticket.status] || 'bg-gray-100 text-gray-600';
 
             feed.innerHTML += `
                         <div class="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="text-xs font-bold px-2 py-1 rounded ${priorityColor}">${ticket.priority}</span>
-                                <span class="text-xs text-gray-400 font-mono">${ticket.category}</span>
+                                <span class="text-xs font-bold px-2 py-1 rounded ${priorityColor}">${ticket.priority || 'PENDING'}</span>
+                                <span class="text-xs font-bold px-2 py-1 rounded ${statusColor}">${ticket.status}</span>
                             </div>
                             <h3 class="font-bold text-gray-800">${ticket.title}</h3>
                             <p class="text-sm text-gray-600 mt-1">${ticket.description}</p>
@@ -151,7 +159,7 @@
           return;
         }
 
-        btn.innerText = 'AI is thinking...';
+        btn.innerText = 'Submitting...';
         btn.disabled = true;
 
         const payload = {
@@ -160,41 +168,29 @@
           userId,
         };
 
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
 
-                const json = await res.json();
+          const json = await res.json();
 
-                if (!res.ok) {
-                    let errorMsg = json.message || 'Error creating ticket';
+          if (!res.ok) {
+            let errorMsg = json.message || 'Error creating ticket';
 
-                    if (json.errors && json.errors.length > 0) {
-                        errorMsg = json.errors.map((e: any) =>
-                            `${e.field}: ${e.message}`
-                        ).join('\n');
-                    }
-
-                    alert(errorMsg);
-                    btn.innerText = 'Submit to AI';
-                    btn.disabled = false;
-                    return;
-                }
-
-                document.getElementById('title').value = '';
-                document.getElementById('desc').value = '';
-                fetchTickets();
-            } catch (err) {
-                alert('Failed to submit ticket');
-                console.error(err);
+            if (json.errors && json.errors.length > 0) {
+              errorMsg = json.errors
+                .map((e) => `${e.field}: ${e.message}`)
+                .join('\n');
             }
 
+            alert(errorMsg);
             btn.innerText = 'Submit to AI';
             btn.disabled = false;
-        }
+            return;
+          }
 
           document.getElementById('title').value = '';
           document.getElementById('desc').value = '';

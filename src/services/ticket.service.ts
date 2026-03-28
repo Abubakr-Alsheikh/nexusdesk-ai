@@ -1,22 +1,24 @@
 import { prisma } from './db.service';
-import { AIService } from './ai.service';
-import { CreateTicketInput, TicketFilterQuery } from '../validators/ticket.schema';
+import { addTicketToQueue } from './queue.service';
+import {
+  CreateTicketInput,
+  TicketFilterQuery,
+} from '../validators/ticket.schema';
 import { AppError } from '../utils/AppError';
 
 export class TicketService {
   public static async createTicket(data: CreateTicketInput) {
-    const analysis = await AIService.analyzeTicket(data.title, data.description);
-
     try {
       const ticket = await prisma.ticket.create({
         data: {
           title: data.title,
           description: data.description,
           userId: data.userId,
-          category: analysis.category,
-          priority: analysis.priority,
+          status: 'PENDING',
         },
       });
+
+      await addTicketToQueue(ticket.id);
 
       return ticket;
     } catch (error) {

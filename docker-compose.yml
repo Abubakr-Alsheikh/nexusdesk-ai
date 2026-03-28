@@ -9,9 +9,16 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${DB_PORT}:5432"
+      - '${DB_PORT}:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexusdesk_redis
+    ports:
+      - '6379:6379'
     restart: unless-stopped
 
 volumes:

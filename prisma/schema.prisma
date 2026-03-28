@@ -21,16 +21,23 @@ enum Category {
   GENERAL
 }
 
+enum TicketStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
 model Ticket {
-  id          String   @id @default(uuid())
+  id          String       @id @default(uuid())
   title       String
-  description String   @db.Text
+  description String       @db.Text
   userId      String
-  
+  status      TicketStatus @default(PENDING)
+
   // AI Generated Metadata
-  category    Category @default(GENERAL)
-  priority    Priority @default(LOW)
-  
+  category    Category?
+  priority    Priority?
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -1,0 +1,9 @@
+-- CreateEnum
+CREATE TYPE "TicketStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED');
+
+-- AlterTable
+ALTER TABLE "Ticket" ADD COLUMN     "status" "TicketStatus" NOT NULL DEFAULT 'PENDING',
+ALTER COLUMN "category" DROP NOT NULL,
+ALTER COLUMN "category" DROP DEFAULT,
+ALTER COLUMN "priority" DROP NOT NULL,
+ALTER COLUMN "priority" DROP DEFAULT;
