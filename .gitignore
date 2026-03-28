@@ -3,10 +3,7 @@
 # ==========================================
 node_modules/
 jspm_packages/
-package-lock.json
-# Note: Some teams commit package-lock.json, but in microservices 
-# it is often rebuilt during CI/CD. For this project, keep it out 
-# if you want a "clean" repo, or include it for deterministic builds.
+# Note: package-lock.json is committed for deterministic CI builds
 
 # ==========================================
 # 2. BUILD OUTPUTS (TypeScript)
