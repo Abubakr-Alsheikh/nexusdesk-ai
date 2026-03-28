@@ -3,209 +3,378 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NexusDesk AI | Triage Dashboard</title>
+    <title>NexusDesk AI | Enterprise Triage</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+      }
+    </style>
   </head>
-  <body class="bg-gray-50 font-sans">
-    <nav class="bg-indigo-700 text-white p-4 shadow-lg">
+  <body class="bg-slate-50 font-sans text-slate-900">
+    <!-- NAVIGATION -->
+    <nav class="bg-indigo-700 text-white p-4 shadow-xl sticky top-0 z-50">
       <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold tracking-tight">
-          NexusDesk <span class="text-indigo-200">AI</span>
-        </h1>
-        <span
-          class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-medium border border-indigo-500"
-          >Live Dashboard</span
-        >
+        <div class="flex items-center space-x-2">
+          <div
+            class="bg-white text-indigo-700 p-1 rounded font-black text-xl italic"
+          >
+            ND
+          </div>
+          <h1 class="text-2xl font-bold tracking-tight">
+            NexusDesk <span class="text-indigo-200">AI</span>
+          </h1>
+        </div>
+        <div id="navUser" class="hidden flex items-center space-x-4">
+          <span
+            id="userName"
+            class="text-sm font-medium border-r border-indigo-500 pr-4"
+          ></span>
+          <button
+            onclick="logout()"
+            class="text-xs bg-indigo-800 hover:bg-red-600 px-3 py-1.5 rounded-md transition duration-300"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </nav>
 
-    <main class="container mx-auto mt-10 p-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Sidebar: Submit Ticket -->
-        <div
-          class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit"
-        >
-          <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-            New Ticket
-          </h2>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-600"
-                >User ID</label
-              >
-              <input
-                id="userId"
-                type="text"
-                value="550e8400-e29b-41d4-a716-446655440000"
-                class="w-full mt-1 p-2 border rounded-md bg-gray-50 text-xs"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-600"
-                >Subject</label
-              >
-              <input
-                id="title"
-                type="text"
-                placeholder="Issue title..."
-                class="w-full mt-1 p-2 border rounded-md"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-600"
-                >Description</label
-              >
-              <textarea
-                id="desc"
-                rows="4"
-                placeholder="Describe the problem..."
-                class="w-full mt-1 p-2 border rounded-md"
-              ></textarea>
-            </div>
-            <button
-              onclick="submitTicket()"
-              id="btn"
-              class="w-full bg-indigo-600 text-white font-bold py-2 rounded-md hover:bg-indigo-700 transition"
+    <!-- AUTH SCREEN -->
+    <div
+      id="authScreen"
+      class="min-h-[80vh] flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-100"
+      >
+        <div class="flex mb-8 bg-slate-100 p-1 rounded-lg">
+          <button
+            id="tabLogin"
+            onclick="switchAuth('login')"
+            class="w-1/2 py-2 rounded-md font-bold text-sm bg-white shadow-sm transition"
+          >
+            Login
+          </button>
+          <button
+            id="tabSignup"
+            onclick="switchAuth('signup')"
+            class="w-1/2 py-2 rounded-md font-bold text-sm text-slate-500 transition"
+          >
+            Signup
+          </button>
+        </div>
+
+        <div id="authInputs" class="space-y-4">
+          <div id="nameGroup" class="hidden">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1"
+              >Full Name</label
             >
-              Submit to AI
-            </button>
+            <input
+              id="authName"
+              type="text"
+              placeholder="John Doe"
+              class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1"
+              >Email Address</label
+            >
+            <input
+              id="authEmail"
+              type="email"
+              placeholder="john@company.com"
+              class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1"
+              >Password</label
+            >
+            <input
+              id="authPassword"
+              type="password"
+              placeholder="••••••••"
+              class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+          <button
+            onclick="handleAuth()"
+            id="authBtn"
+            class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-[0.98]"
+          >
+            Enter Platform
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboard" class="hidden container mx-auto mt-10 p-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Sidebar: Form -->
+        <div class="lg:col-span-4">
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 sticky top-24"
+          >
+            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center">
+              <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+              </span>
+              Submit Ticket
+            </h2>
+            <div class="space-y-4">
+              <div>
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase mb-1"
+                  >Issue Subject</label
+                >
+                <input
+                  id="ticketTitle"
+                  type="text"
+                  placeholder="Brief summary..."
+                  class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase mb-1"
+                  >Detailed Description</label
+                >
+                <textarea
+                  id="ticketDesc"
+                  rows="4"
+                  placeholder="Explain the problem..."
+                  class="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"
+                ></textarea>
+              </div>
+              <button
+                onclick="submitTicket()"
+                id="submitBtn"
+                class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-black transition flex justify-center items-center"
+              >
+                Trigger AI Triage
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Main Content: Ticket Feed -->
-        <div class="md:col-span-2">
-          <h2 class="text-xl font-semibold mb-4 text-gray-800">
-            AI Triage Feed
-          </h2>
+        <!-- Feed -->
+        <div class="lg:col-span-8">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800">Active Triage Feed</h2>
+            <button
+              onclick="fetchTickets()"
+              class="text-indigo-600 text-sm font-bold hover:underline"
+            >
+              Refresh Feed
+            </button>
+          </div>
           <div id="feed" class="space-y-4">
-            <!-- Tickets will appear here -->
-            <div class="text-center text-gray-400 py-10">
-              Loading tickets...
-            </div>
+            <!-- Loading State -->
           </div>
         </div>
       </div>
-    </main>
+    </div>
 
     <script>
-      const API_URL = '/api/v1/tickets';
+      let authMode = 'login';
+      const API_BASE = '/api/v1';
+
+      // 1. AUTH LOGIC
+      function switchAuth(mode) {
+        authMode = mode;
+        document
+          .getElementById('nameGroup')
+          .classList.toggle('hidden', mode === 'login');
+        document.getElementById('tabLogin').className =
+          mode === 'login'
+            ? 'w-1/2 py-2 rounded-md font-bold text-sm bg-white shadow-sm transition'
+            : 'w-1/2 py-2 rounded-md font-bold text-sm text-slate-500 transition';
+        document.getElementById('tabSignup').className =
+          mode === 'signup'
+            ? 'w-1/2 py-2 rounded-md font-bold text-sm bg-white shadow-sm transition'
+            : 'w-1/2 py-2 rounded-md font-bold text-sm text-slate-500 transition';
+        document.getElementById('authBtn').innerText =
+          mode === 'login' ? 'Login' : 'Create Account';
+      }
+
+      async function handleAuth() {
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+        const name = document.getElementById('authName').value;
+
+        const endpoint = authMode === 'login' ? '/auth/login' : '/auth/signup';
+        const body =
+          authMode === 'login'
+            ? { email, password }
+            : { email, password, name };
+
+        try {
+          const res = await fetch(`${API_BASE}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+
+          if (data.status === 'success') {
+            localStorage.setItem('token', data.data.token);
+            checkAuth();
+          } else {
+            alert(data.message || 'Auth failed');
+          }
+        } catch (err) {
+          alert('Network error during authentication');
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem('token');
+        location.reload();
+      }
+
+      // 2. DASHBOARD LOGIC
+      async function checkAuth() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          document.getElementById('authScreen').classList.remove('hidden');
+          document.getElementById('dashboard').classList.add('hidden');
+          document.getElementById('navUser').classList.add('hidden');
+          return;
+        }
+
+        // Fetch current user info
+        const res = await fetch(`${API_BASE}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          document.getElementById('authScreen').classList.add('hidden');
+          document.getElementById('dashboard').classList.remove('hidden');
+          document.getElementById('navUser').classList.remove('hidden');
+          document.getElementById('userName').innerText = data.data.user.name;
+          fetchTickets();
+        } else {
+          logout();
+        }
+      }
 
       async function fetchTickets() {
-        try {
-          const res = await fetch(API_URL);
-          const json = await res.json();
-          const feed = document.getElementById('feed');
+        const token = localStorage.getItem('token');
+        const feed = document.getElementById('feed');
 
-          if (
-            !json.data ||
-            !json.data.tickets ||
-            json.data.tickets.length === 0
-          ) {
+        try {
+          const res = await fetch(`${API_BASE}/tickets`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const json = await res.json();
+
+          if (!json.data.tickets.length) {
             feed.innerHTML =
-              '<div class="text-center text-gray-400 py-10">No tickets yet. Submit one!</div>';
+              '<div class="text-center py-20 bg-white rounded-2xl text-slate-400">No tickets found. Submit one to see AI in action.</div>';
             return;
           }
 
-          feed.innerHTML = '';
+          feed.innerHTML = json.data.tickets
+            .map((t) => {
+              const statusIcon =
+                t.status === 'PENDING'
+                  ? '⏳'
+                  : t.status === 'COMPLETED'
+                    ? '✅'
+                    : '❌';
+              const priorityClass =
+                {
+                  CRITICAL: 'bg-red-50 text-red-700 border-red-100',
+                  HIGH: 'bg-orange-50 text-orange-700 border-orange-100',
+                  MEDIUM: 'bg-blue-50 text-blue-700 border-blue-100',
+                  LOW: 'bg-slate-50 text-slate-700 border-slate-100',
+                }[t.priority] || 'bg-slate-50 text-slate-400 border-slate-100';
 
-          json.data.tickets.forEach((ticket) => {
-            const priorityColor =
-              {
-                LOW: 'bg-gray-100 text-gray-600',
-                MEDIUM: 'bg-blue-100 text-blue-600',
-                HIGH: 'bg-orange-100 text-orange-600',
-                CRITICAL: 'bg-red-100 text-red-600',
-              }[ticket.priority] || 'bg-gray-100 text-gray-600';
-
-            const statusColor =
-              {
-                PENDING: 'bg-yellow-100 text-yellow-700',
-                COMPLETED: 'bg-green-100 text-green-700',
-                FAILED: 'bg-red-100 text-red-700',
-              }[ticket.status] || 'bg-gray-100 text-gray-600';
-
-            feed.innerHTML += `
-                        <div class="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-xs font-bold px-2 py-1 rounded ${priorityColor}">${ticket.priority || 'PENDING'}</span>
-                                <span class="text-xs font-bold px-2 py-1 rounded ${statusColor}">${ticket.status}</span>
+              return `
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition duration-300">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex space-x-2">
+                                    <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border ${priorityClass}">
+                                        ${t.priority || 'Analyzing...'}
+                                    </span>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border border-indigo-100 bg-indigo-50 text-indigo-600">
+                                        ${t.category || 'Triage...'}
+                                    </span>
+                                </div>
+                                <span class="text-lg">${statusIcon}</span>
                             </div>
-                            <h3 class="font-bold text-gray-800">${ticket.title}</h3>
-                            <p class="text-sm text-gray-600 mt-1">${ticket.description}</p>
-                            <div class="mt-3 pt-3 border-t text-[10px] text-gray-400 flex justify-between">
-                                <span>ID: ${ticket.id}</span>
-                                <span>${new Date(ticket.createdAt).toLocaleString()}</span>
+                            <h3 class="font-bold text-slate-800 text-lg mb-1">${t.title}</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">${t.description}</p>
+                            <div class="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center">
+                                <span class="text-[10px] font-mono text-slate-400 uppercase">Ref: ${t.id.split('-')[0]}</span>
+                                <span class="text-[10px] font-bold text-slate-400">${new Date(t.createdAt).toLocaleString()}</span>
                             </div>
                         </div>
                     `;
-          });
+            })
+            .join('');
         } catch (err) {
-          console.error('Error fetching tickets:', err);
+          console.error('Fetch error:', err);
         }
       }
 
       async function submitTicket() {
-        const btn = document.getElementById('btn');
-        const title = document.getElementById('title').value;
-        const description = document.getElementById('desc').value;
-        const userId = document.getElementById('userId').value;
+        const title = document.getElementById('ticketTitle').value;
+        const description = document.getElementById('ticketDesc').value;
+        const token = localStorage.getItem('token');
+        const btn = document.getElementById('submitBtn');
 
-        if (title.length < 5) {
-          alert('Title must be at least 5 characters');
-          return;
-        }
-        if (description.length < 10) {
-          alert('Description must be at least 10 characters');
-          return;
-        }
+        if (!title || !description) return alert('Please fill all fields');
 
-        btn.innerText = 'Submitting...';
         btn.disabled = true;
-
-        const payload = {
-          title,
-          description,
-          userId,
-        };
+        btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
 
         try {
-          const res = await fetch(API_URL, {
+          await fetch(`${API_BASE}/tickets`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ title, description }),
           });
 
-          const json = await res.json();
-
-          if (!res.ok) {
-            let errorMsg = json.message || 'Error creating ticket';
-
-            if (json.errors && json.errors.length > 0) {
-              errorMsg = json.errors
-                .map((e) => `${e.field}: ${e.message}`)
-                .join('\n');
-            }
-
-            alert(errorMsg);
-            btn.innerText = 'Submit to AI';
-            btn.disabled = false;
-            return;
-          }
-
-          document.getElementById('title').value = '';
-          document.getElementById('desc').value = '';
+          document.getElementById('ticketTitle').value = '';
+          document.getElementById('ticketDesc').value = '';
           fetchTickets();
         } catch (err) {
-          alert('Failed to submit ticket');
-          console.error(err);
+          alert('Submission failed');
+        } finally {
+          btn.disabled = false;
+          btn.innerText = 'Trigger AI Triage';
         }
-
-        btn.innerText = 'Submit to AI';
-        btn.disabled = false;
       }
 
-      fetchTickets();
-      setInterval(fetchTickets, 10000);
+      // Initialize
+      checkAuth();
+      setInterval(() => {
+        if (localStorage.getItem('token')) fetchTickets();
+      }, 5000);
     </script>
   </body>
 </html>
