@@ -44,6 +44,8 @@ jobs:
           DATABASE_URL: 'postgresql://postgres:password@localhost:5432/nexusdesk'
           AI_API_KEY: 'mock-key-for-ci'
           AI_MODEL: 'gpt-4o-mini'
+          JWT_SECRET: 'test-secret-key-for-jwt-testing-purposes-32chars'
+          JWT_EXPIRES_IN: '1d'
 
   build-and-push:
     needs: quality-control
