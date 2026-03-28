@@ -65,7 +65,7 @@ _Note: Ensure `DATABASE_URL` matches the credentials in your `docker-compose.yml
 | ------------- | -------------------------------- | --------------------------- |
 | `AI_API_KEY`  | API key for your AI provider     | (required)                  |
 | `AI_BASE_URL` | Base URL for the AI API          | `https://api.openai.com/v1` |
-| `AI_MODEL`    | Model to use for ticket analysis | `gpt-5-nano`               |
+| `AI_MODEL`    | Model to use for ticket analysis | `gpt-5-nano`                |
 
 **Example for OpenRouter:**
 
@@ -91,6 +91,30 @@ npx prisma migrate dev --name init_schema
 # Development mode (Nodemon)
 npm run dev
 ```
+
+---
+
+## 📡 API Documentation
+
+### Swagger UI
+
+Interactive API documentation is available at **http://localhost:3000/docs**
+
+- Try out endpoints directly from the browser
+- View request/response schemas
+- Access JSON spec at `/docs.json`
+
+### Live Triage Dashboard
+
+A real-time dashboard to see AI-powered ticket triage in action:
+
+**URL:** http://localhost:3000/
+
+Features:
+
+- Submit new tickets and watch AI categorize them instantly
+- View all tickets with assigned category and priority
+- Auto-refreshes every 10 seconds
 
 ---
 
@@ -145,3 +169,4 @@ npm run dev
 - **Vector Search:** Implement **pgvector** to detect duplicate tickets or find similar past resolutions.
 - **Authentication:** Add JWT-based security to protect ticket retrieval endpoints.
 - **Unit Testing:** Implement a full suite of Jest tests with Prisma and LLM mocking.
+- **Real-time Updates:** Replace polling with WebSockets for instant ticket updates in dashboard.

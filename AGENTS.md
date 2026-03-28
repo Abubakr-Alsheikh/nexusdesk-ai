@@ -118,7 +118,8 @@ nexusdesk-ai/
 │   ├── server.ts          # Entry point
 │   ├── app.ts             # Express configuration
 │   ├── config/
-│   │   └── env.ts         # Zod environment validation
+│   │   ├── env.ts         # Zod environment validation
+│   │   └── swagger.ts    # Swagger UI configuration
 │   ├── utils/
 │   │   ├── AppError.ts    # Custom error class
 │   │   └── catchAsync.ts  # Async wrapper
@@ -137,6 +138,8 @@ nexusdesk-ai/
 │   └── routes/
 │       ├── index.ts
 │       └── ticket.routes.ts
+├── public/
+│   └── index.html         # Live Triage Dashboard
 ├── prisma/
 │   └── schema.prisma
 ├── docker-compose.yml
@@ -214,3 +217,7 @@ npm run dev
 npm run build
 npm run start
 ```
+
+FINAL REQUEST (VERY IMPORTANT REQUEST):
+
+After finishing the changes that you made or the task that asked for, update the Agents.md file and README.md to keep the context of the project updated if new feature or structure added

@@ -160,21 +160,41 @@
           userId,
         };
 
-        try {
-          const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-          const json = await res.json();
+                const json = await res.json();
 
-          if (!res.ok) {
-            alert(json.message || 'Error creating ticket');
+                if (!res.ok) {
+                    let errorMsg = json.message || 'Error creating ticket';
+
+                    if (json.errors && json.errors.length > 0) {
+                        errorMsg = json.errors.map((e: any) =>
+                            `${e.field}: ${e.message}`
+                        ).join('\n');
+                    }
+
+                    alert(errorMsg);
+                    btn.innerText = 'Submit to AI';
+                    btn.disabled = false;
+                    return;
+                }
+
+                document.getElementById('title').value = '';
+                document.getElementById('desc').value = '';
+                fetchTickets();
+            } catch (err) {
+                alert('Failed to submit ticket');
+                console.error(err);
+            }
+
             btn.innerText = 'Submit to AI';
             btn.disabled = false;
-            return;
-          }
+        }
 
           document.getElementById('title').value = '';
           document.getElementById('desc').value = '';

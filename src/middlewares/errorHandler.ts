@@ -18,11 +18,16 @@ export const errorHandler = (
 
   if (err.name === 'ZodError') {
     statusCode = 400;
-    message = 'Validation Error';
+    message = 'Validation failed';
+    const issues = err.errors || err.issues || [];
+    const formattedErrors = issues.map((e: any) => ({
+      field: e.path ? e.path[e.path.length - 1] : 'unknown',
+      message: e.message,
+    }));
     return res.status(statusCode).json({
       status: 'error',
       message,
-      errors: err.errors,
+      errors: formattedErrors,
     });
   }
 
