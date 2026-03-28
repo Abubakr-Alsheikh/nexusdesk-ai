@@ -5,6 +5,7 @@ import { aiAnalysisSchema, AIAnalysis } from '../validators/ai.schema';
 
 const openai = new OpenAI({
   apiKey: env.AI_API_KEY,
+  baseURL: env.AI_BASE_URL,
 });
 
 export class AIService {
@@ -37,7 +38,7 @@ Output must be strictly JSON in this format:
       const userPrompt = `Ticket Title: ${title}\nTicket Description: ${description}`;
 
       const response = await openai.chat.completions.create({
-        model: 'gpt-5-mini',
+        model: env.AI_MODEL,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },

@@ -22,6 +22,8 @@ const envSchema = z.object({
   AI_API_KEY: z
     .string()
     .min(1, { message: 'AI_API_KEY is required for the LLM Service' }),
+  AI_BASE_URL: z.string().url().default('https://api.openai.com/v1'),
+  AI_MODEL: z.string().default('gpt-5-nano'),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
