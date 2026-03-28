@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NexusDesk AI | Triage Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 font-sans">
+    <nav class="bg-indigo-700 text-white p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold tracking-tight">
+          NexusDesk <span class="text-indigo-200">AI</span>
+        </h1>
+        <span
+          class="bg-indigo-600 px-3 py-1 rounded-full text-sm font-medium border border-indigo-500"
+          >Live Dashboard</span
+        >
+      </div>
+    </nav>
+
+    <main class="container mx-auto mt-10 p-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Sidebar: Submit Ticket -->
+        <div
+          class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit"
+        >
+          <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+            New Ticket
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-600"
+                >User ID</label
+              >
+              <input
+                id="userId"
+                type="text"
+                value="550e8400-e29b-41d4-a716-446655440000"
+                class="w-full mt-1 p-2 border rounded-md bg-gray-50 text-xs"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600"
+                >Subject</label
+              >
+              <input
+                id="title"
+                type="text"
+                placeholder="Issue title..."
+                class="w-full mt-1 p-2 border rounded-md"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600"
+                >Description</label
+              >
+              <textarea
+                id="desc"
+                rows="4"
+                placeholder="Describe the problem..."
+                class="w-full mt-1 p-2 border rounded-md"
+              ></textarea>
+            </div>
+            <button
+              onclick="submitTicket()"
+              id="btn"
+              class="w-full bg-indigo-600 text-white font-bold py-2 rounded-md hover:bg-indigo-700 transition"
+            >
+              Submit to AI
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Content: Ticket Feed -->
+        <div class="md:col-span-2">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">
+            AI Triage Feed
+          </h2>
+          <div id="feed" class="space-y-4">
+            <!-- Tickets will appear here -->
+            <div class="text-center text-gray-400 py-10">
+              Loading tickets...
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const API_URL = '/api/v1/tickets';
+
+      async function fetchTickets() {
+        try {
+          const res = await fetch(API_URL);
+          const json = await res.json();
+          const feed = document.getElementById('feed');
+
+          if (
+            !json.data ||
+            !json.data.tickets ||
+            json.data.tickets.length === 0
+          ) {
+            feed.innerHTML =
+              '<div class="text-center text-gray-400 py-10">No tickets yet. Submit one!</div>';
+            return;
+          }
+
+          feed.innerHTML = '';
+
+          json.data.tickets.forEach((ticket) => {
+            const priorityColor = {
+              LOW: 'bg-gray-100 text-gray-600',
+              MEDIUM: 'bg-blue-100 text-blue-600',
+              HIGH: 'bg-orange-100 text-orange-600',
+              CRITICAL: 'bg-red-100 text-red-600',
+            }[ticket.priority];
+
+            feed.innerHTML += `
+                        <div class="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-bold px-2 py-1 rounded ${priorityColor}">${ticket.priority}</span>
+                                <span class="text-xs text-gray-400 font-mono">${ticket.category}</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">${ticket.title}</h3>
+                            <p class="text-sm text-gray-600 mt-1">${ticket.description}</p>
+                            <div class="mt-3 pt-3 border-t text-[10px] text-gray-400 flex justify-between">
+                                <span>ID: ${ticket.id}</span>
+                                <span>${new Date(ticket.createdAt).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `;
+          });
+        } catch (err) {
+          console.error('Error fetching tickets:', err);
+        }
+      }
+
+      async function submitTicket() {
+        const btn = document.getElementById('btn');
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('desc').value;
+        const userId = document.getElementById('userId').value;
+
+        if (title.length < 5) {
+          alert('Title must be at least 5 characters');
+          return;
+        }
+        if (description.length < 10) {
+          alert('Description must be at least 10 characters');
+          return;
+        }
+
+        btn.innerText = 'AI is thinking...';
+        btn.disabled = true;
+
+        const payload = {
+          title,
+          description,
+          userId,
+        };
+
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+          const json = await res.json();
+
+          if (!res.ok) {
+            alert(json.message || 'Error creating ticket');
+            btn.innerText = 'Submit to AI';
+            btn.disabled = false;
+            return;
+          }
+
+          document.getElementById('title').value = '';
+          document.getElementById('desc').value = '';
+          fetchTickets();
+        } catch (err) {
+          alert('Failed to submit ticket');
+          console.error(err);
+        }
+
+        btn.innerText = 'Submit to AI';
+        btn.disabled = false;
+      }
+
+      fetchTickets();
+      setInterval(fetchTickets, 10000);
+    </script>
+  </body>
+</html>
