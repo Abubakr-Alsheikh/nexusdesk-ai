@@ -10,25 +10,31 @@ process.on('uncaughtException', (err) => {
 
 async function bootstrap() {
   try {
+    // 1. Connect to Database
     await prisma.$connect();
-    console.log('✅ Database connection established successfully.');
+    console.info('✅ Database connection established successfully.');
 
+    // 2. Start the Express Server
     const server = app.listen(env.PORT, () => {
-      console.log(`🚀 NexusDesk AI Service running on port ${env.PORT}`);
-      console.log(`Environment: ${env.NODE_ENV}`);
+      console.info(`🚀 NexusDesk AI Service running on port ${env.PORT}`);
+      console.info(`Environment: ${env.NODE_ENV}`);
     });
 
-    process.on('unhandledRejection', (err: any) => {
-      console.error('UNHANDLED REJECTION! 💥 Shutting down...');
-      console.error(err.name, err.message);
+    // 3. Graceful Shutdown logic (Standard in Enterprise)
+    // If the process receives a signal to stop (like Ctrl+C), close DB connections first
+    process.on('SIGTERM', () => {
+      console.info('SIGTERM received. Shutting down gracefully...');
       server.close(() => {
-        process.exit(1);
+        prisma.$disconnect();
+        console.info('Process terminated.');
       });
     });
   } catch (error) {
     console.error('❌ Failed to start the server:', error);
+    await prisma.$disconnect();
     process.exit(1);
   }
 }
 
+// Execute the bootstrap
 bootstrap();
