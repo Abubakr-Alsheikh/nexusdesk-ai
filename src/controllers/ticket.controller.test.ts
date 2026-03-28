@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '../app';
-import { prismaMock } from '../__mocks__/prisma';
+import { prismaMock } from '../tests/setup';
 
 jest.mock('../services/queue.service', () => ({
   addTicketToQueue: jest.fn().mockResolvedValue(undefined),

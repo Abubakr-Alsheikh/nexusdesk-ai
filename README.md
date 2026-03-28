@@ -166,6 +166,19 @@ Features:
 - **Background Job Processing:** Uses BullMQ with Redis for async AI analysis - API returns instantly while AI processing happens in background with retry logic.
 - **Deterministic AI Guardrails:** We use OpenAI's **JSON Mode** coupled with a **Zod validator** to ensure the LLM never returns invalid categories or priorities.
 - **Containerization:** Full Docker support for reproducible development and deployment environments.
+- **CI/CD Pipeline:** GitHub Actions automates linting, type checking, testing, and Docker image builds.
+
+---
+
+## 🐳 Docker
+
+```bash
+# Build the production Docker image
+docker build -t nexusdesk-ai:latest .
+
+# Run the container
+docker run -p 3000:3000 nexusdesk-ai:latest
+```
 
 ---
 
@@ -173,5 +186,4 @@ Features:
 
 - **Vector Search:** Implement **pgvector** to detect duplicate tickets or find similar past resolutions.
 - **Authentication:** Add JWT-based security to protect ticket retrieval endpoints.
-- **Unit Testing:** Implement a full suite of Jest tests with Prisma and LLM mocking.
 - **Real-time Updates:** Replace polling with WebSockets for instant ticket updates in dashboard.

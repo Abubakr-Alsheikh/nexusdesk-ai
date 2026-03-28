@@ -39,7 +39,7 @@ npm run db:studio    # Open Prisma Studio (GUI for DB)
 ### Linting & Formatting
 
 ```bash
-npx eslint src/      # Lint TypeScript files
+npm run lint         # Lint TypeScript files
 npx prettier --write src/  # Format code
 ```
 
@@ -145,8 +145,12 @@ nexusdesk-ai/
 │   └── index.html         # Live Triage Dashboard
 ├── prisma/
 │   └── schema.prisma
+├── .github/workflows/
+│   └── ci.yml            # GitHub Actions CI/CD
 ├── docker-compose.yml
+├── Dockerfile            # Multi-stage production build
 ├── jest.config.js
+├── eslint.config.js
 ├── tsconfig.json
 └── package.json
 ```
@@ -221,6 +225,26 @@ npm run dev
 npm run build
 npm run start
 ```
+
+### Docker
+
+```bash
+# Build Docker image
+docker build -t nexusdesk-ai:latest .
+
+# Run container
+docker run -p 3000:3000 nexusdesk-ai:latest
+```
+
+---
+
+## CI/CD
+
+The project includes GitHub Actions workflows in `.github/workflows/ci.yml`:
+
+- Runs on push to main/develop branches and PRs to main
+- Quality Control: Type check, Prisma generate, Tests
+- Build: Docker image build on main branch push
 
 FINAL REQUEST (VERY IMPORTANT REQUEST):
 

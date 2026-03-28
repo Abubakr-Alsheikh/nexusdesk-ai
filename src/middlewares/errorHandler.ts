@@ -1,32 +1,41 @@
 import { Request, Response, NextFunction } from 'express';
 import { env } from '../config/env';
-import { AppError } from '../utils/AppError';
+
+interface ValidationError {
+  path: string[];
+  message: string;
+}
 
 export const errorHandler = (
-  err: any,
-  req: Request,
+  err: unknown,
+  _req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
-  let statusCode = err.statusCode || 500;
-  let message = err.message || 'Internal Server Error';
+  const statusCode = (err as { statusCode?: number }).statusCode || 500;
+  const message =
+    (err as { message?: string }).message || 'Internal Server Error';
 
-  if (err.code === 'P2002') {
-    statusCode = 400;
-    message = 'Duplicate field value entered';
+  if ((err as { code?: string }).code === 'P2002') {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Duplicate field value entered',
+    });
   }
 
-  if (err.name === 'ZodError') {
-    statusCode = 400;
-    message = 'Validation failed';
-    const issues = err.errors || err.issues || [];
-    const formattedErrors = issues.map((e: any) => ({
-      field: e.path ? e.path[e.path.length - 1] : 'unknown',
+  if ((err as { name?: string }).name === 'ZodError') {
+    const zodErr = err as {
+      errors?: ValidationError[];
+      issues?: ValidationError[];
+    };
+    const issues = zodErr.errors || zodErr.issues || [];
+    const formattedErrors = issues.map((e: ValidationError) => ({
+      field: e.path.length > 0 ? e.path[e.path.length - 1] : 'unknown',
       message: e.message,
     }));
-    return res.status(statusCode).json({
+    return res.status(400).json({
       status: 'error',
-      message,
+      message: 'Validation failed',
       errors: formattedErrors,
     });
   }
@@ -35,13 +44,15 @@ export const errorHandler = (
     res.status(statusCode).json({
       status: 'error',
       message,
-      stack: err.stack,
+      stack: (err as { stack?: string }).stack,
       error: err,
     });
   } else {
     res.status(statusCode).json({
       status: 'error',
-      message: err.isOperational ? message : 'Something went very wrong',
+      message: (err as { isOperational?: boolean }).isOperational
+        ? message
+        : 'Something went very wrong',
     });
   }
 };

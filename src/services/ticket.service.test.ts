@@ -1,5 +1,5 @@
 import { TicketService } from './ticket.service';
-import { prismaMock } from '../__mocks__/prisma';
+import { prismaMock } from '../tests/setup';
 import * as QueueService from './queue.service';
 
 jest.mock('./queue.service', () => ({

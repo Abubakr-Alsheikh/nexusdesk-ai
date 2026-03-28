@@ -38,7 +38,7 @@ export class TicketService {
           createdAt: 'desc',
         },
       });
-    } catch (error) {
+    } catch {
       throw new AppError('Failed to fetch tickets', 500);
     }
   }
