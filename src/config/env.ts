@@ -3,28 +3,35 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const envSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'production', 'test'])
-    .default('development'),
-  PORT: z.string().default('3000').transform(Number),
+const envSchema = z
+  .object({
+    NODE_ENV: z
+      .enum(['development', 'production', 'test'])
+      .default('development'),
+    PORT: z.string().default('3000').transform(Number),
 
-  // Database
-  DB_USER: z.string().min(1),
-  DB_PASSWORD: z.string().min(1),
-  DB_NAME: z.string().min(1),
-  DB_PORT: z.string().default('5432'),
-  DATABASE_URL: z
-    .string()
-    .url({ message: 'DATABASE_URL must be a valid PostgreSQL URL' }),
+    // Database - either individual params or DATABASE_URL
+    DB_USER: z.string().optional(),
+    DB_PASSWORD: z.string().optional(),
+    DB_NAME: z.string().optional(),
+    DB_PORT: z.string().default('5432'),
+    DATABASE_URL: z
+      .string()
+      .url({ message: 'DATABASE_URL must be a valid PostgreSQL URL' })
+      .optional(),
 
-  // AI
-  AI_API_KEY: z
-    .string()
-    .min(1, { message: 'AI_API_KEY is required for the LLM Service' }),
-  AI_BASE_URL: z.string().url().default('https://api.openai.com/v1'),
-  AI_MODEL: z.string().default('gpt-5-nano'),
-});
+    // AI
+    AI_API_KEY: z
+      .string()
+      .min(1, { message: 'AI_API_KEY is required for the LLM Service' }),
+    AI_BASE_URL: z.string().url().default('https://api.openai.com/v1'),
+    AI_MODEL: z.string().default('gpt-5-nano'),
+  })
+  .refine(
+    (data) =>
+      data.DATABASE_URL || (data.DB_USER && data.DB_PASSWORD && data.DB_NAME),
+    { message: 'Either DATABASE_URL or individual DB params required' },
+  );
 
 const parsedEnv = envSchema.safeParse(process.env);
 
