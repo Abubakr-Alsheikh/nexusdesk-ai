@@ -1,5 +1,5 @@
-import app from './app';
 import { env } from './config/env';
+import app from './app';
 import { prisma } from './services/db.service';
 
 process.on('uncaughtException', (err) => {
@@ -25,7 +25,6 @@ async function bootstrap() {
         process.exit(1);
       });
     });
-
   } catch (error) {
     console.error('❌ Failed to start the server:', error);
     process.exit(1);
