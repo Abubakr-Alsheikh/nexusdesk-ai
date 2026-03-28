@@ -27,6 +27,7 @@ This project follows a **Strict Layered Architecture** to ensure maintainability
 - **Database:** PostgreSQL 16 (via Docker)
 - **Queue:** BullMQ with Redis (Background Job Processing)
 - **ORM:** Prisma
+- **Testing:** Jest with Supertest (Mocked Prisma & Redis)
 - **Validation:** Zod (Request, AI Output, and Env validation)
 - **AI:** OpenAI-compatible API (configurable - supports OpenAI, OpenRouter, Anthropic via Proxy, Ollama, etc.)
 

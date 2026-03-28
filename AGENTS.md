@@ -13,6 +13,7 @@ NexusDesk AI is an enterprise-grade microservice that ingests customer support t
 - **Framework:** Express.js
 - **Database:** PostgreSQL via Prisma
 - **Queue:** BullMQ with Redis
+- **Testing:** Jest with Supertest
 - **Validation:** Zod
 - **AI:** OpenAI SDK
 
@@ -44,18 +45,12 @@ npx prettier --write src/  # Format code
 
 ### Running Tests
 
-This project does not currently have a test framework configured. The test script is a placeholder:
-
 ```bash
-npm test             # Currently echoes "Error: no test specified"
+npm test             # Run all tests
+npm run test:watch   # Run tests in watch mode
 ```
 
-To run a single test file when tests are added:
-
-```bash
-npx vitest run <file-path>   # If using Vitest
-npx jest <file-path>         # If using Jest
-```
+Tests use Jest with mocked Prisma and BullMQ for fast, deterministic execution without external dependencies.
 
 ---
 
@@ -139,14 +134,19 @@ nexusdesk-ai/
 │   │   └── worker.service.ts  # BullMQ consumer
 │   ├── controllers/
 │   │   └── ticket.controller.ts
-│   └── routes/
-│       ├── index.ts
-│       └── ticket.routes.ts
+│   ├── routes/
+│   │   ├── index.ts
+│   │   └── ticket.routes.ts
+│   ├── __mocks__/
+│   │   └── prisma.ts          # Jest Prisma mock
+│   └── tests/
+│       └── setup.ts           # Jest setup file
 ├── public/
 │   └── index.html         # Live Triage Dashboard
 ├── prisma/
 │   └── schema.prisma
 ├── docker-compose.yml
+├── jest.config.js
 ├── tsconfig.json
 └── package.json
 ```
