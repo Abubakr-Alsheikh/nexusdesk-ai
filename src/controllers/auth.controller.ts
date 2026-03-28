@@ -20,4 +20,11 @@ export class AuthController {
       data: result,
     });
   });
+
+  public static getMe = catchAsync(async (req: Request, res: Response) => {
+    res.status(200).json({
+      status: 'success',
+      data: { user: req.user },
+    });
+  });
 }
