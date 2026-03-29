@@ -38,6 +38,9 @@ describe('TicketService', () => {
     expect(prismaMock.ticket.create).toHaveBeenCalledWith({
       data: expect.objectContaining({ status: 'PENDING' }),
     });
-    expect(QueueService.addTicketToQueue).toHaveBeenCalledWith('test-uuid');
+    expect(QueueService.addTicketToQueue).toHaveBeenCalledWith(
+      'test-uuid',
+      undefined,
+    );
   });
 });

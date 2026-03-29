@@ -6,7 +6,11 @@ import { TicketFilterQuery } from '../validators/ticket.schema';
 export class TicketController {
   public static createTicket = catchAsync(
     async (req: Request, res: Response) => {
-      const ticket = await TicketService.createTicket(req.body, req.user!.id);
+      const ticket = await TicketService.createTicket(
+        req.body,
+        req.user!.id,
+        req.id as string,
+      );
 
       res.status(201).json({
         status: 'success',

@@ -7,7 +7,11 @@ import {
 import { AppError } from '../utils/AppError';
 
 export class TicketService {
-  public static async createTicket(data: CreateTicketInput, userId: string) {
+  public static async createTicket(
+    data: CreateTicketInput,
+    userId: string,
+    requestId?: string,
+  ) {
     try {
       const ticket = await prisma.ticket.create({
         data: {
@@ -18,7 +22,7 @@ export class TicketService {
         },
       });
 
-      await addTicketToQueue(ticket.id);
+      await addTicketToQueue(ticket.id, requestId);
 
       return ticket;
     } catch (error) {

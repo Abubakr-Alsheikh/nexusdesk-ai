@@ -2,13 +2,16 @@ import { Worker, Job } from 'bullmq';
 import { redisConfig, TRIAGE_QUEUE } from '../config/redis';
 import { prisma } from './db.service';
 import { AIService } from './ai.service';
+import { logger } from '../utils/logger';
 
 export const initWorker = () => {
   const worker = new Worker(
     TRIAGE_QUEUE,
     async (job: Job) => {
-      const { ticketId } = job.data;
-      console.info(`Processing Job ${job.id} for Ticket ${ticketId}`);
+      const { ticketId, correlationId } = job.data;
+      const childLogger = logger.child({ correlationId, ticketId });
+
+      childLogger.info('Starting AI triage for ticket');
 
       const ticket = await prisma.ticket.findUnique({
         where: { id: ticketId },
@@ -30,9 +33,9 @@ export const initWorker = () => {
           },
         });
 
-        console.info(`Ticket ${ticketId} triaged successfully.`);
+        childLogger.info('Successfully updated ticket');
       } catch (error) {
-        console.error(`Job failed for Ticket ${ticketId}:`, error);
+        childLogger.error({ err: error }, 'Triage job failed');
 
         if (job.attemptsMade >= (job.opts.attempts || 1)) {
           await prisma.ticket.update({
@@ -47,6 +50,6 @@ export const initWorker = () => {
   );
 
   worker.on('failed', (job, err) => {
-    console.error(`${job?.id} has failed with ${err.message}`);
+    logger.error({ jobId: job?.id, err }, 'Job failed');
   });
 };

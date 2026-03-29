@@ -8,12 +8,16 @@ import express, {
 import path from 'path';
 import router from './routes';
 import { errorHandler } from './middlewares/errorHandler';
+import { requestLogger } from './middlewares/requestLogger';
 import { AppError } from './utils/AppError';
 import { setupSwagger } from './config/swagger';
 
 const app: Application = express();
 
-// 1. Standard Middlewares
+// 1. MUST BE FIRST: Request logging with correlation IDs
+app.use(requestLogger);
+
+// 2. Standard Middlewares
 app.use(express.json({ limit: '10kb' }));
 
 // 2. Static Files (Dashboard)

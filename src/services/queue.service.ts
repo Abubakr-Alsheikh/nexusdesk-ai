@@ -5,10 +5,13 @@ export const triageQueue = new Queue(TRIAGE_QUEUE, {
   connection: redisConfig,
 });
 
-export const addTicketToQueue = async (ticketId: string) => {
+export const addTicketToQueue = async (
+  ticketId: string,
+  requestId?: string,
+) => {
   await triageQueue.add(
     'analyze-ticket',
-    { ticketId },
+    { ticketId, correlationId: requestId },
     {
       attempts: 3,
       backoff: { type: 'exponential', delay: 5000 },

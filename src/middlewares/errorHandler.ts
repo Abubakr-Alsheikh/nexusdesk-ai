@@ -8,7 +8,7 @@ interface ValidationError {
 
 export const errorHandler = (
   err: unknown,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
@@ -16,10 +16,18 @@ export const errorHandler = (
   const message =
     (err as { message?: string }).message || 'Internal Server Error';
 
+  req.log.error({
+    msg: message,
+    stack: (err as { stack?: string }).stack,
+    path: req.path,
+    method: req.method,
+  });
+
   if ((err as { code?: string }).code === 'P2002') {
     return res.status(400).json({
       status: 'error',
       message: 'Duplicate field value entered',
+      requestId: req.id,
     });
   }
 
@@ -37,6 +45,7 @@ export const errorHandler = (
       status: 'error',
       message: 'Validation failed',
       errors: formattedErrors,
+      requestId: req.id,
     });
   }
 
@@ -46,6 +55,7 @@ export const errorHandler = (
       message,
       stack: (err as { stack?: string }).stack,
       error: err,
+      requestId: req.id,
     });
   } else {
     res.status(statusCode).json({
@@ -53,6 +63,7 @@ export const errorHandler = (
       message: (err as { isOperational?: boolean }).isOperational
         ? message
         : 'Something went very wrong',
+      requestId: req.id,
     });
   }
 };
