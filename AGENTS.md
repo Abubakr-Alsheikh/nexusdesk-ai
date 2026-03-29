@@ -16,6 +16,8 @@ NexusDesk AI is an enterprise-grade microservice that ingests customer support t
 - **Testing:** Jest with Supertest
 - **Validation:** Zod
 - **AI:** OpenAI SDK
+- **Logging:** Pino (structured JSON logging)
+- **Observability:** Correlation ID request tracing
 
 ---
 
@@ -97,7 +99,7 @@ Tests use Jest with mocked Prisma and BullMQ for fast, deterministic execution w
 - Throw `AppError` for operational errors with HTTP status code
 - Wrap async controller functions with `catchAsync` utility
 - Use global `errorHandler` middleware for consistent error responses
-- Log errors appropriately (use console.warn/console.error, not console.log)
+- Use the `logger` from `src/utils/logger.ts` for structured logging (not console.log)
 
 ### Zod Validation
 
@@ -105,6 +107,14 @@ Tests use Jest with mocked Prisma and BullMQ for fast, deterministic execution w
 - Use `z.infer<>` to derive TypeScript types
 - Validate request bodies in middleware using `validate` middleware
 - Validate AI responses before using them (detect hallucinations)
+
+### Logging
+
+- Use `logger` from `src/utils/logger.ts` for all logging
+- In development: pretty-printed colored logs
+- In production: structured JSON logs for parsing by monitoring tools
+- Sensitive data (passwords, tokens) is automatically redacted
+- Correlation IDs track requests from API through background worker
 
 ### Project Structure
 
@@ -119,11 +129,13 @@ nexusdesk-ai/
 │   │   └── swagger.ts     # Swagger UI configuration
 │   ├── utils/
 │   │   ├── AppError.ts    # Custom error class
-│   │   └── catchAsync.ts  # Async wrapper
+│   │   ├── catchAsync.ts  # Async wrapper
+│   │   └── logger.ts      # Pino structured logger
 │   ├── middlewares/
 │   │   ├── errorHandler.ts
 │   │   ├── validate.ts
-│   │   └── auth.middleware.ts  # JWT authentication middleware
+│   │   ├── auth.middleware.ts  # JWT authentication middleware
+│   │   └── requestLogger.ts    # Pino HTTP request logging
 │   ├── validators/
 │   │   ├── ticket.schema.ts
 │   │   ├── ai.schema.ts

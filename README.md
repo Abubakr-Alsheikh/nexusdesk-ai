@@ -30,6 +30,8 @@ This project follows a **Strict Layered Architecture** to ensure maintainability
 - **Testing:** Jest with Supertest (Mocked Prisma & Redis)
 - **Validation:** Zod (Request, AI Output, and Env validation)
 - **AI:** OpenAI-compatible API (configurable - supports OpenAI, OpenRouter, Anthropic via Proxy, Ollama, etc.)
+- **Logging:** Pino (structured JSON logging)
+- **Observability:** Correlation ID tracking from API to background worker
 
 ---
 
@@ -238,6 +240,8 @@ Authorization: Bearer <your-jwt-token>
 - **Containerization:** Full Docker support for reproducible development and deployment environments.
 - **CI/CD Pipeline:** GitHub Actions automates linting, type checking, testing, and Docker image builds.
 - **JWT Authentication:** Stateless JWT-based auth with bcrypt password hashing to secure ticket endpoints.
+- **Structured Logging:** Uses **Pino** for machine-readable JSON logs in production and pretty-printed logs in development.
+- **Request Tracing:** Correlation IDs track requests from API through the background worker for full end-to-end traceability.
 
 ---
 

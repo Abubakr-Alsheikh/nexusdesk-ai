@@ -12,12 +12,14 @@ function generateId(): string {
 export const requestLogger = pinoHttp({
   logger,
   genReqId: (req) => (req.headers['x-request-id'] as string) || generateId(),
+  autoLogging: {
+    ignore: (req) => req.url === '/docs' || req.url === '/docs.json',
+  },
   customLogLevel: (res, err) => {
     const statusCode = res.statusCode ?? 0;
     if (err) return 'error';
     if (statusCode >= 500) return 'error';
     if (statusCode >= 400 && statusCode < 500) return 'warn';
-    if (statusCode >= 300 && statusCode < 400) return 'debug';
     return 'info';
   },
   customProps: (req) => ({
