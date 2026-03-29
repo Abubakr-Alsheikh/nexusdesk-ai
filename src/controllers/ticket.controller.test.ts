@@ -10,7 +10,7 @@ jest.mock('../services/queue.service', () => ({
 const mockUserId = '550e8400-e29b-41d4-a716-446655440000';
 const mockToken = jwt.sign(
   { id: mockUserId },
-  'super-secret-enterprise-key-change-this-in-prod',
+  process.env.JWT_SECRET || 'super-secret-enterprise-key-change-this-in-prod',
 );
 
 const mockUser = {
